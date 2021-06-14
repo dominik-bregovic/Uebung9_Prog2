@@ -33,19 +33,22 @@ public class MyJDBC {
             state.execute("USE timetable");
 
 
-            createTable("administrator");
-            createProfTable("professors");
-            createCourses("courses");
-            createRoom("rooms");
-            createSchedule("schedule");
+           /* createTable();
+            createProfTable();
+            createCourses();
+            createRoom();
+            createSchedule();*/
+
+            //here i have to get the info of the person from the gui
+            insertIntoProfessorTable("michal", "eden", "math");
+            //here i can add courses to the table
+            insertCoursesInTable("math", 1);
+            // location of the course
+            insertRoomsInTable(1,"west");
 
 
 
-            stmt = connection.prepareStatement("INSERT INTO professors (firstname,lastname)VALUES(?, ?, ?)");
-            //insertPersonsInTable("Michael", "Eden", "mathematics");
 
-            stmt = connection.prepareStatement("INSERT INTO courses (course_name)VALUES(?, ?)");
-            insertCoursesInTable("Mathe");
 
             //deleteSingleRecordViaTransaction();
 
@@ -69,10 +72,10 @@ public class MyJDBC {
 ////////////////////////////////////////////////////////////////////////////////
 
 
-    private static void createTable(String tablename) throws SQLException{
+    private static void createTable() throws SQLException{
 
         String createTable;
-        createTable = "CREATE TABLE IF NOT EXISTS " + tablename + " (id INT(11) NOT NULL AUTO_INCREMENT,"
+        createTable = "CREATE TABLE IF NOT EXISTS administrator (id INT(11) NOT NULL AUTO_INCREMENT,"
                 + " firstname VARCHAR(255) NOT NULL COLLATE utf8_unicode_ci, "
                 + "lastname VARCHAR(255) NOT NULL COLLATE utf8_unicode_ci, "
                 + "PRIMARY KEY (id))";
@@ -86,10 +89,10 @@ public class MyJDBC {
         }
     }
 
-    private static void createProfTable(String tablename) throws SQLException{
+    private static void createProfTable() throws SQLException{
 
         String createTable;
-        createTable = "CREATE TABLE IF NOT EXISTS " + tablename + " (id INT(11) NOT NULL AUTO_INCREMENT,"
+        createTable = "CREATE TABLE IF NOT EXISTS " + "professors" + " (id INT(11) NOT NULL AUTO_INCREMENT,"
                 + " firstname VARCHAR(255) NOT NULL COLLATE utf8_unicode_ci, "
                 + "lastname VARCHAR(255) NOT NULL COLLATE utf8_unicode_ci, "
                 + "coursename  VARCHAR(255) NOT NULL COLLATE utf8_unicode_ci,"
@@ -104,10 +107,10 @@ public class MyJDBC {
         }
     }
 
-    private static void createCourses(String tablename) throws SQLException{
+    private static void createCourses() throws SQLException{
 
         String createTable;
-        createTable = "CREATE TABLE IF NOT EXISTS " + tablename + " (id INT(11) NOT NULL AUTO_INCREMENT,"
+        createTable = "CREATE TABLE IF NOT EXISTS " + "courses" + " (id INT(11) NOT NULL AUTO_INCREMENT,"
                 + " course_name VARCHAR(255) NOT NULL COLLATE utf8_unicode_ci, "
                 + " proff_Id INT(11) NOT NULL, "
                 + "PRIMARY KEY (id))";
@@ -121,10 +124,10 @@ public class MyJDBC {
         }
     }
 
-    private static void createSchedule(String tablename) throws SQLException{
+    private static void createSchedule() throws SQLException{
 
         String createTable;
-        createTable = "CREATE TABLE IF NOT EXISTS " + tablename + " (week_day VARCHAR(255) NOT NULL COLLATE utf8_unicode_ci,"
+        createTable = "CREATE TABLE IF NOT EXISTS " + "schedule" + " (week_day VARCHAR(255) NOT NULL COLLATE utf8_unicode_ci,"
                 + " course_name VARCHAR(255) NOT NULL COLLATE utf8_unicode_ci, "
                 + "prof_Id INT(11) NOT NULL, "
                 + "PRIMARY KEY (week_day))";
@@ -138,10 +141,10 @@ public class MyJDBC {
         }
     }
 
-    private static void createRoom(String tablename) throws SQLException{
+    private static void createRoom() throws SQLException{
 
         String createTable;
-        createTable = "CREATE TABLE IF NOT EXISTS " + tablename + " (room_Nr INT(11) NOT NULL,"
+        createTable = "CREATE TABLE IF NOT EXISTS " + "rooms" + " (room_Nr INT(11) NOT NULL,"
                 + " room_location VARCHAR(255) NOT NULL COLLATE utf8_unicode_ci, "
                 + "PRIMARY KEY (room_NR))";
 
@@ -155,13 +158,18 @@ public class MyJDBC {
     }
 
     /////////////////////////////////////////////////////////////////////////
-    private static void insertPersonsInTable(String first, String last, String course) throws SQLException{
+
+    private static void insertCoursesInTable(String courseName, int index) throws SQLException{
+
+        stmt = connection.prepareStatement("INSERT INTO courses (course_name, proff_Id)VALUES(?, ?)");
+
         try {
 
-            stmt.setString(1, first);
-            stmt.setString(2, last);
-            stmt.setString(3, course);
+            stmt.setString(1, courseName);
+            stmt.setInt(2, index);
+
             stmt.addBatch();
+
             stmt.executeBatch();
 
         } catch (SQLException e) {
@@ -171,24 +179,42 @@ public class MyJDBC {
         }
     }
 
-    private static void insertCoursesInTable(String courseName) throws SQLException{
+    private static void insertRoomsInTable(int room_nr, String location) throws SQLException{
+
+        stmt = connection.prepareStatement("INSERT INTO rooms (room_nr, room_location)VALUES(?, ?)");
+
         try {
 
-            stmt.setString(1, courseName);
-            stmt.setInt(2, 0);
+            stmt.setInt(1, room_nr);
+            stmt.setString(2, location);
             stmt.addBatch();
 
             stmt.executeBatch();
 
         } catch (SQLException e) {
-           /* throw new SQLException(stmt.getWarnings().getMessage(),
+            throw new SQLException(stmt.getWarnings().getMessage(),
                     stmt.getWarnings().getSQLState(),
-                    stmt.getWarnings().getErrorCode());*/
+                    stmt.getWarnings().getErrorCode());
         }
     }
 
-    public static void insertNewProf(){
+    public static void insertIntoProfessorTable(String firstname, String lastname, String course) throws SQLException {
 
+        stmt = connection.prepareStatement("INSERT INTO professors (firstname,lastname,coursename)VALUES(?, ?, ?)");
+
+        try {
+
+            stmt.setString(1, firstname);
+            stmt.setString(2, lastname);
+            stmt.setString(3, course);
+            stmt.addBatch();
+            stmt.executeBatch();
+
+        } catch (SQLException e) {
+            throw new SQLException(stmt.getWarnings().getMessage(),
+                    stmt.getWarnings().getSQLState(),
+                    stmt.getWarnings().getErrorCode());
+        }
     }
 
     ////////////////////////////////////////////////////////////////////////////
