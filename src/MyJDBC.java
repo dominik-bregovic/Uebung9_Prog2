@@ -15,7 +15,7 @@ public class MyJDBC {
     private static Scanner scan = new Scanner(System.in);
     private static Long validateID;
 
-    public static void main(String[] args) {
+    public MyJDBC(){
         createRegistrationTable();
     }
 
@@ -32,14 +32,21 @@ public class MyJDBC {
             state.executeUpdate(sqlCommand);
             state.execute("USE timetable");
 
-           // stmt = connection.prepareStatement("INSERT INTO administrator (firstname,lastname,department,amount)VALUES(?, ?, ?, ?)");
 
             createTable("administrator");
-            createTable("assistents");
-            createTable("students");
+            createProfTable("professors");
             createCourses("courses");
+            createRoom("rooms");
             createSchedule("schedule");
-            //insertRecordsInTable();
+
+
+
+            stmt = connection.prepareStatement("INSERT INTO professors (firstname,lastname)VALUES(?, ?, ?)");
+            //insertPersonsInTable("Michael", "Eden", "mathematics");
+
+            stmt = connection.prepareStatement("INSERT INTO courses (course_name)VALUES(?, ?)");
+            insertCoursesInTable("Mathe");
+
             //deleteSingleRecordViaTransaction();
 
         } catch (SQLException e) {
@@ -59,6 +66,8 @@ public class MyJDBC {
             }
         }
     }
+////////////////////////////////////////////////////////////////////////////////
+
 
     private static void createTable(String tablename) throws SQLException{
 
@@ -77,11 +86,30 @@ public class MyJDBC {
         }
     }
 
+    private static void createProfTable(String tablename) throws SQLException{
+
+        String createTable;
+        createTable = "CREATE TABLE IF NOT EXISTS " + tablename + " (id INT(11) NOT NULL AUTO_INCREMENT,"
+                + " firstname VARCHAR(255) NOT NULL COLLATE utf8_unicode_ci, "
+                + "lastname VARCHAR(255) NOT NULL COLLATE utf8_unicode_ci, "
+                + "coursename  VARCHAR(255) NOT NULL COLLATE utf8_unicode_ci,"
+                + "PRIMARY KEY (id))";
+
+        try {
+            state.executeUpdate(createTable);
+        }catch (SQLException e){
+            throw new SQLException(state.getWarnings().getMessage(),
+                    state.getWarnings().getSQLState(),
+                    state.getWarnings().getErrorCode());
+        }
+    }
+
     private static void createCourses(String tablename) throws SQLException{
 
         String createTable;
         createTable = "CREATE TABLE IF NOT EXISTS " + tablename + " (id INT(11) NOT NULL AUTO_INCREMENT,"
                 + " course_name VARCHAR(255) NOT NULL COLLATE utf8_unicode_ci, "
+                + " proff_Id INT(11) NOT NULL, "
                 + "PRIMARY KEY (id))";
 
         try {
@@ -96,10 +124,10 @@ public class MyJDBC {
     private static void createSchedule(String tablename) throws SQLException{
 
         String createTable;
-        createTable = "CREATE TABLE IF NOT EXISTS " + tablename + " (id INT(11) NOT NULL AUTO_INCREMENT,"
-                + " firstname VARCHAR(255) NOT NULL COLLATE utf8_unicode_ci, "
-                + "lastname VARCHAR(255) NOT NULL COLLATE utf8_unicode_ci, "
-                + "PRIMARY KEY (id))";
+        createTable = "CREATE TABLE IF NOT EXISTS " + tablename + " (week_day VARCHAR(255) NOT NULL COLLATE utf8_unicode_ci,"
+                + " course_name VARCHAR(255) NOT NULL COLLATE utf8_unicode_ci, "
+                + "prof_Id INT(11) NOT NULL, "
+                + "PRIMARY KEY (week_day))";
 
         try {
             state.executeUpdate(createTable);
@@ -110,33 +138,30 @@ public class MyJDBC {
         }
     }
 
-    private static void insertRecordsInTable() throws SQLException{
+    private static void createRoom(String tablename) throws SQLException{
+
+        String createTable;
+        createTable = "CREATE TABLE IF NOT EXISTS " + tablename + " (room_Nr INT(11) NOT NULL,"
+                + " room_location VARCHAR(255) NOT NULL COLLATE utf8_unicode_ci, "
+                + "PRIMARY KEY (room_NR))";
+
+        try {
+            state.executeUpdate(createTable);
+        }catch (SQLException e){
+            throw new SQLException(state.getWarnings().getMessage(),
+                    state.getWarnings().getSQLState(),
+                    state.getWarnings().getErrorCode());
+        }
+    }
+
+    /////////////////////////////////////////////////////////////////////////
+    private static void insertPersonsInTable(String first, String last, String course) throws SQLException{
         try {
 
-            stmt.setString(1, "Max");
-            stmt.setString(2, "Mustermann");
-            stmt.setString(3, "Engineering");
-            stmt.setInt(4, 2000);
+            stmt.setString(1, first);
+            stmt.setString(2, last);
+            stmt.setString(3, course);
             stmt.addBatch();
-
-            stmt.setString(1, "Katrin");
-            stmt.setString(2, "Musterfrau");
-            stmt.setString(3, "Production");
-            stmt.setInt(4, 2200);
-            stmt.addBatch();
-
-            stmt.setString(1, "John");
-            stmt.setString(2, "Doe");
-            stmt.setString(3, "Engineering");
-            stmt.setInt(4, 2400);
-            stmt.addBatch();
-
-            stmt.setString(1, "Becker");
-            stmt.setString(2, "Heinz");
-            stmt.setString(3, "Marketing");
-            stmt.setInt(4, 2800);
-            stmt.addBatch();
-
             stmt.executeBatch();
 
         } catch (SQLException e) {
@@ -145,6 +170,30 @@ public class MyJDBC {
                     stmt.getWarnings().getErrorCode());
         }
     }
+
+    private static void insertCoursesInTable(String courseName) throws SQLException{
+        try {
+
+            stmt.setString(1, courseName);
+            stmt.setInt(2, 0);
+            stmt.addBatch();
+
+            stmt.executeBatch();
+
+        } catch (SQLException e) {
+           /* throw new SQLException(stmt.getWarnings().getMessage(),
+                    stmt.getWarnings().getSQLState(),
+                    stmt.getWarnings().getErrorCode());*/
+        }
+    }
+
+    public static void insertNewProf(){
+
+    }
+
+    ////////////////////////////////////////////////////////////////////////////
+
+
 
     public static void deleteSingleRecordViaTransaction(){
         validation();
