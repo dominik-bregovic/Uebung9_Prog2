@@ -21,20 +21,24 @@ public class MyJDBC {
 
     public static void createRegistrationTable() {
         String url = "jdbc:mysql://localhost:3306/";
-        String username = "dbd_user";
-        String password = "8_7*06AZ!#y";
+        String username = "StudentTimetable";
+        String password = "1234";
         String sqlCommand;
-        sqlCommand = "CREATE DATABASE IF NOT EXISTS dbd_employee CHARACTER SET utf8 COLLATE utf8_unicode_ci";
+        sqlCommand = "CREATE DATABASE IF NOT EXISTS timetable CHARACTER SET utf8 COLLATE utf8_unicode_ci";
 
         try  {
             connection = DriverManager.getConnection(url, username, password);
             state = connection.createStatement();
             state.executeUpdate(sqlCommand);
-            state.execute("USE dbd_employee");
+            state.execute("USE timetable");
 
-            stmt = connection.prepareStatement("INSERT INTO salary (firstname,lastname,department,amount)VALUES(?, ?, ?, ?)");
+           // stmt = connection.prepareStatement("INSERT INTO administrator (firstname,lastname,department,amount)VALUES(?, ?, ?, ?)");
 
-            createTable();
+            createTable("administrator");
+            createTable("assistents");
+            createTable("students");
+            createCourses("courses");
+            createSchedule("schedule");
             //insertRecordsInTable();
             //deleteSingleRecordViaTransaction();
 
@@ -56,14 +60,46 @@ public class MyJDBC {
         }
     }
 
-    private static void createTable() throws SQLException{
+    private static void createTable(String tablename) throws SQLException{
 
         String createTable;
-        createTable = "CREATE TABLE IF NOT EXISTS salary (id INT(11) NOT NULL AUTO_INCREMENT,"
+        createTable = "CREATE TABLE IF NOT EXISTS " + tablename + " (id INT(11) NOT NULL AUTO_INCREMENT,"
                 + " firstname VARCHAR(255) NOT NULL COLLATE utf8_unicode_ci, "
                 + "lastname VARCHAR(255) NOT NULL COLLATE utf8_unicode_ci, "
-                + "department VARCHAR(255) NOT NULL COLLATE utf8_unicode_ci, "
-                + "amount INT(11) NOT NULL , PRIMARY KEY (id))";
+                + "PRIMARY KEY (id))";
+
+        try {
+            state.executeUpdate(createTable);
+        }catch (SQLException e){
+            throw new SQLException(state.getWarnings().getMessage(),
+                    state.getWarnings().getSQLState(),
+                    state.getWarnings().getErrorCode());
+        }
+    }
+
+    private static void createCourses(String tablename) throws SQLException{
+
+        String createTable;
+        createTable = "CREATE TABLE IF NOT EXISTS " + tablename + " (id INT(11) NOT NULL AUTO_INCREMENT,"
+                + " course_name VARCHAR(255) NOT NULL COLLATE utf8_unicode_ci, "
+                + "PRIMARY KEY (id))";
+
+        try {
+            state.executeUpdate(createTable);
+        }catch (SQLException e){
+            throw new SQLException(state.getWarnings().getMessage(),
+                    state.getWarnings().getSQLState(),
+                    state.getWarnings().getErrorCode());
+        }
+    }
+
+    private static void createSchedule(String tablename) throws SQLException{
+
+        String createTable;
+        createTable = "CREATE TABLE IF NOT EXISTS " + tablename + " (id INT(11) NOT NULL AUTO_INCREMENT,"
+                + " firstname VARCHAR(255) NOT NULL COLLATE utf8_unicode_ci, "
+                + "lastname VARCHAR(255) NOT NULL COLLATE utf8_unicode_ci, "
+                + "PRIMARY KEY (id))";
 
         try {
             state.executeUpdate(createTable);
