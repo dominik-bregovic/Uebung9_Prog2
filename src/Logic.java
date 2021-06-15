@@ -1,4 +1,5 @@
 import javax.swing.*;
+import javax.swing.table.DefaultTableModel;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.*;
@@ -55,6 +56,8 @@ public class Logic extends JFrame implements ActionListener {
                 jdbc.searchForRecord("password", "professors", password)){
             log.login.dispose();
             log.createTableFrame(1000, 750, "Timetable");
+            log.table1.setModel(jdbc.createTable(new DefaultTableModel()));
+
         }else{
             log.error("dont know");
         }

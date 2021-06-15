@@ -1,3 +1,5 @@
+import javax.swing.*;
+import javax.swing.table.DefaultTableModel;
 import java.sql.*;
 import java.util.Scanner;
 
@@ -38,7 +40,7 @@ public class MyJDBC {
 
             //here i have to get the info of the person from the gui
             //insertIntoProfessorTable("michael", "eden", "math", "msd");
-           // insertIntoProfessorTable("peter", "eden", "math");
+            insertIntoProfessorTable("peter", "eden", "math", "msd");
             //here i can add courses to the table
             //insertCoursesInTable("math", 1);
             // location of the course, attetion with the int primary key here!!!!!
@@ -244,6 +246,25 @@ public class MyJDBC {
             System.err.println(e.getMessage());
         }
         return false;
+    }
+
+    public DefaultTableModel createTable(DefaultTableModel model){
+        try {
+
+            String sql="SELECT * FROM schedule";
+            ResultSet rs = stmt.executeQuery(sql);
+            while(rs.next())
+            {
+                String d = rs.getString("week_day");
+                String e = rs.getString("course_name");
+                String f = rs.getString("prof_Id");
+                model.addRow(new Object[]{d, e, f});
+            }
+            return model;
+        }catch (SQLException e){
+            e.printStackTrace();
+        }
+        return model;
     }
 
     /*public static void validation(){

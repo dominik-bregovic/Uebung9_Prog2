@@ -1,5 +1,6 @@
 import javax.swing.*;
 import java.awt.*;
+import java.sql.SQLException;
 
 
 /*
@@ -13,6 +14,7 @@ public class MyGui extends JFrame{
     JFrame login = new JFrame();
     JFrame errorFrame = new JFrame();
     JFrame table = new JFrame();
+    JTable table1 = new JTable();
     JTextField eMail = new JTextField();
     JTextField user = new JTextField();
     JPanel accountsPanel = new JPanel();
@@ -154,6 +156,8 @@ public class MyGui extends JFrame{
         this.table.setLocationRelativeTo(null);
         this.table.add(createHeader(new JPanel(),500,0, 500, 50));
     }
+
+
 
 
     /*public JPanel createPasswordLines(JPanel panel, int x, int y, int width, int height){
