@@ -155,6 +155,8 @@ public class MyGui extends JFrame{
         this.table.setVisible(true);
         this.table.setLocationRelativeTo(null);
         this.table.add(createHeader(new JPanel(),500,0, 500, 50));
+        Container cnt = this.getContentPane();
+
     }
 
 

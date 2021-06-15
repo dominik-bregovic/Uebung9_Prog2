@@ -40,7 +40,8 @@ public class MyJDBC {
 
             //here i have to get the info of the person from the gui
             //insertIntoProfessorTable("michael", "eden", "math", "msd");
-            insertIntoProfessorTable("peter", "eden", "math", "msd");
+            //insertIntoProfessorTable("peter", "eden", "math", "msd");
+            //insertIntoScheduleTable("tuesday", "mathematics", 1);
             //here i can add courses to the table
             //insertCoursesInTable("math", 1);
             // location of the course, attetion with the int primary key here!!!!!
@@ -219,6 +220,25 @@ public class MyJDBC {
             stmt.setString(2, lastname);
             stmt.setString(3, course);
             stmt.setString(4, password);
+            stmt.addBatch();
+            stmt.executeBatch();
+
+        } catch (SQLException e) {
+            throw new SQLException(stmt.getWarnings().getMessage(),
+                    stmt.getWarnings().getSQLState(),
+                    stmt.getWarnings().getErrorCode());
+        }
+    }
+
+    public static void insertIntoScheduleTable(String week_day, String course_name, int prof_Id) throws SQLException {
+
+        stmt = connection.prepareStatement("INSERT INTO schedule (week_day, course_name, prof_Id)VALUES(?, ?, ?)");
+
+        try {
+
+            stmt.setString(1, week_day);
+            stmt.setString(2, course_name);
+            stmt.setInt(3, prof_Id);
             stmt.addBatch();
             stmt.executeBatch();
 

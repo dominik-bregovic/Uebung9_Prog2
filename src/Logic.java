@@ -57,6 +57,7 @@ public class Logic extends JFrame implements ActionListener {
             log.login.dispose();
             log.createTableFrame(1000, 750, "Timetable");
             log.table1.setModel(jdbc.createTable(new DefaultTableModel()));
+            log.table.add(log.table1);
 
         }else{
             log.error("dont know");
