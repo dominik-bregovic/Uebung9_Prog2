@@ -145,7 +145,7 @@ public class MyGui extends JFrame{
         return panel;
     }
 
-    public void createTableFrame(int width, int height, String title){
+    public Container createTableFrame(int width, int height, String title){
         this.table.setTitle(title);
         this.table.setResizable(false);
         this.table.setSize(width,height);
@@ -156,6 +156,8 @@ public class MyGui extends JFrame{
         this.table.setLocationRelativeTo(null);
         this.table.add(createHeader(new JPanel(),500,0, 500, 50));
         Container cnt = this.getContentPane();
+        return cnt;
+
 
     }
 

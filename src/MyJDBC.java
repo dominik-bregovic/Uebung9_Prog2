@@ -1,5 +1,6 @@
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
+import java.awt.*;
 import java.sql.*;
 import java.util.Scanner;
 
@@ -268,23 +269,29 @@ public class MyJDBC {
         return false;
     }
 
-    public DefaultTableModel createTable(DefaultTableModel model){
-        try {
+    public void createTable(DefaultTableModel model, Container cnt){
 
-            String sql="SELECT * FROM schedule";
-            ResultSet rs = stmt.executeQuery(sql);
-            while(rs.next())
-            {
-                String d = rs.getString("week_day");
-                String e = rs.getString("course_name");
-                String f = rs.getString("prof_Id");
-                model.addRow(new Object[]{d, e, f});
+        //Container cnt = this.getContentPane();
+        JTable jtbl = new JTable(model);
+            cnt.setLayout(new FlowLayout(FlowLayout.LEFT));
+            model.addColumn("Id");
+            model.addColumn("Username");
+            model.addColumn("Password");
+            model.addColumn("Create");
+            try {
+                stmt = connection.prepareStatement("SELECT * FROM schedule");
+                ResultSet Rs = stmt.executeQuery();
+                while(Rs.next()){
+                    model.addRow(new Object[]{Rs.getInt(1),
+                            Rs.getString(2),
+                            Rs.getInt(3)});
+                }
+            } catch (Exception e) {
+                System.out.println(e.getMessage());
             }
-            return model;
-        }catch (SQLException e){
-            e.printStackTrace();
-        }
-        return model;
+            JScrollPane pg = new JScrollPane(jtbl);
+            cnt.add(pg);
+            this.pack();
     }
 
     /*public static void validation(){
