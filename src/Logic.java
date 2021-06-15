@@ -55,8 +55,7 @@ public class Logic extends JFrame implements ActionListener {
         if (jdbc.searchForRecord("firstname", "professors", userName) &&
                 jdbc.searchForRecord("password", "professors", password)){
             log.login.dispose();
-
-            log.table1.setModel(jdbc.createTable(new DefaultTableModel(), log.createTableFrame(1000, 800, "My nes Schedule")));
+            log.table1.setModel(new DefaultTableModel());
             log.table.add(log.table1);
 
         }else{

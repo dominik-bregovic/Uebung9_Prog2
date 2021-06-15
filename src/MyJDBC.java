@@ -268,8 +268,8 @@ public class MyJDBC {
         }
         return false;
     }
-
-    public void createTable(DefaultTableModel model, Container cnt){
+/////////////////////////////////////////////////
+    public void createTable(DefaultTableModel model){
 
         //Container cnt = this.getContentPane();
         JTable jtbl = new JTable(model);
