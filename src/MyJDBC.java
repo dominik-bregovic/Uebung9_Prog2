@@ -13,7 +13,6 @@ public class MyJDBC {
     private static PreparedStatement stmt;
     private static ResultSet result;
     private static Scanner scan = new Scanner(System.in);
-    private static Long validateID;
 
     public MyJDBC(){
         createRegistrationTable();
@@ -33,24 +32,18 @@ public class MyJDBC {
             state.execute("USE timetable");
 
 
-           /* createTable();
-            createProfTable();
-            createCourses();
-            createRoom();
-            createSchedule();*/
+            createTables();
+
+            //könnte die methode insert überladen.....!!
 
             //here i have to get the info of the person from the gui
-            insertIntoProfessorTable("michal", "eden", "math");
+            //insertIntoProfessorTable("michael", "eden", "math", "msd");
+           // insertIntoProfessorTable("peter", "eden", "math");
             //here i can add courses to the table
-            insertCoursesInTable("math", 1);
-            // location of the course
-            insertRoomsInTable(1,"west");
+            //insertCoursesInTable("math", 1);
+            // location of the course, attetion with the int primary key here!!!!!
+            //insertRoomsInTable(1,"west");
 
-
-
-
-
-            //deleteSingleRecordViaTransaction();
 
         } catch (SQLException e) {
             while (e != null){
@@ -59,7 +52,7 @@ public class MyJDBC {
                 System.out.println("State = " + e.getSQLState());
                 e = e.getNextException();
             }
-        }finally {
+        }/*finally {
             try {
                 if (state != null){state.close();}
                 if (stmt != null){stmt.close();}
@@ -67,12 +60,27 @@ public class MyJDBC {
             }catch (SQLException e){
                 e.printStackTrace();
             }
-        }
+        }*/
     }
 ////////////////////////////////////////////////////////////////////////////////
 
+    public static void createTables() throws SQLException{
+        try {
+            createAdminTable();
+            createProfTable();
+            createRoom();
+            createCourses();
+            createSchedule();
 
-    private static void createTable() throws SQLException{
+        }catch (SQLException e){
+            throw new SQLException(state.getWarnings().getMessage(),
+                    state.getWarnings().getSQLState(),
+                    state.getWarnings().getErrorCode());
+        }
+    }
+
+
+    private static void createAdminTable() throws SQLException{
 
         String createTable;
         createTable = "CREATE TABLE IF NOT EXISTS administrator (id INT(11) NOT NULL AUTO_INCREMENT,"
@@ -96,6 +104,7 @@ public class MyJDBC {
                 + " firstname VARCHAR(255) NOT NULL COLLATE utf8_unicode_ci, "
                 + "lastname VARCHAR(255) NOT NULL COLLATE utf8_unicode_ci, "
                 + "coursename  VARCHAR(255) NOT NULL COLLATE utf8_unicode_ci,"
+                + "password VARCHAR(255) NOT NULL COLLATE utf8_unicode_ci, "
                 + "PRIMARY KEY (id))";
 
         try {
@@ -144,7 +153,7 @@ public class MyJDBC {
     private static void createRoom() throws SQLException{
 
         String createTable;
-        createTable = "CREATE TABLE IF NOT EXISTS " + "rooms" + " (room_Nr INT(11) NOT NULL,"
+        createTable = "CREATE TABLE IF NOT EXISTS " + "rooms" + " (room_nr INT(11) NOT NULL,"
                 + " room_location VARCHAR(255) NOT NULL COLLATE utf8_unicode_ci, "
                 + "PRIMARY KEY (room_NR))";
 
@@ -198,15 +207,16 @@ public class MyJDBC {
         }
     }
 
-    public static void insertIntoProfessorTable(String firstname, String lastname, String course) throws SQLException {
+    public static void insertIntoProfessorTable(String firstname, String lastname, String course, String password) throws SQLException {
 
-        stmt = connection.prepareStatement("INSERT INTO professors (firstname,lastname,coursename)VALUES(?, ?, ?)");
+        stmt = connection.prepareStatement("INSERT INTO professors (firstname,lastname,coursename, password)VALUES(?, ?, ?, ?)");
 
         try {
 
             stmt.setString(1, firstname);
             stmt.setString(2, lastname);
             stmt.setString(3, course);
+            stmt.setString(4, password);
             stmt.addBatch();
             stmt.executeBatch();
 
@@ -221,40 +231,22 @@ public class MyJDBC {
 
 
 
-    public static void deleteSingleRecordViaTransaction(){
-        validation();
-        String delete;
+    public static boolean searchForRecord(String collumn, String tablename, String username){
 
         try {
-            result = state.executeQuery("SELECT id FROM salary");
+            result = state.executeQuery("SELECT " + collumn + " FROM " + tablename);
             while (result.next()) {
-
-                if (validateID == result.getLong("id")){
-                    sendingDeleteRequest(validateID);
-                    System.out.print("Is it okay to delete?");
-                    delete = scan.next();
-
-                    if (delete.equals("y")) {
-                        //execute and commit the delete request
-                        state.executeBatch();
-                        connection.commit();
-                        System.out.println("Successfully deleted!");
-                    }else {
-                        //call rollback method!
-                        connection.rollback();
-                        System.out.println("Can not be deleted!");
-                    }
-                    return;
+                if (username.contains(result.getString(collumn))) {
+                    return true;
                 }
             }
-            //gets only printed when id does not exists
-            System.out.println("ID " + validateID + " does not exist!");
         } catch (Exception e) {
             System.err.println(e.getMessage());
         }
+        return false;
     }
 
-    public static void validation(){
+    /*public static void validation(){
         String input;
 
         try {
@@ -277,5 +269,5 @@ public class MyJDBC {
         }catch (Exception e){
             System.err.println(e.getMessage());
         }
-    }
+    }*/
 }
