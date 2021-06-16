@@ -21,7 +21,7 @@ public class MyJDBC {
         createRegistrationTable();
     }
 
-    public static void createRegistrationTable() {
+    public void createRegistrationTable() {
         String url = "jdbc:mysql://localhost:3306/";
         String username = "StudentTimetable";
         String password = "1234";
@@ -34,20 +34,7 @@ public class MyJDBC {
             state.executeUpdate(sqlCommand);
             state.execute("USE timetable");
 
-
             createTables();
-
-            //könnte die methode insert überladen.....!!
-
-            //here i have to get the info of the person from the gui
-            //insertIntoProfessorTable("michael", "eden", "math", "msd");
-            //insertIntoProfessorTable("peter", "eden", "math", "msd");
-            //insertIntoScheduleTable("tuesday", "mathematics", 1);
-            //here i can add courses to the table
-            //insertCoursesInTable("math", 1);
-            // location of the course, attetion with the int primary key here!!!!!
-            //insertRoomsInTable(1,"west");
-
 
         } catch (SQLException e) {
             while (e != null){
@@ -68,10 +55,11 @@ public class MyJDBC {
     }
 ////////////////////////////////////////////////////////////////////////////////
 
-    public static void createTables() throws SQLException{
+    public void createTables() throws SQLException{
         try {
             createAdminTable();
             createProfTable();
+            createStudentsTable();
             createRoom();
             createCourses();
             createSchedule();
@@ -84,7 +72,7 @@ public class MyJDBC {
     }
 
 
-    private static void createAdminTable() throws SQLException{
+    private void createAdminTable() throws SQLException{
 
         String createTable;
         createTable = "CREATE TABLE IF NOT EXISTS administrator (id INT(11) NOT NULL AUTO_INCREMENT,"
@@ -101,7 +89,7 @@ public class MyJDBC {
         }
     }
 
-    private static void createProfTable() throws SQLException{
+    private void createProfTable() throws SQLException{
 
         String createTable;
         createTable = "CREATE TABLE IF NOT EXISTS " + "professors" + " (id INT(11) NOT NULL AUTO_INCREMENT,"
@@ -120,7 +108,25 @@ public class MyJDBC {
         }
     }
 
-    private static void createCourses() throws SQLException{
+    private void createStudentsTable() throws SQLException{
+
+        String createTable;
+        createTable = "CREATE TABLE IF NOT EXISTS " + "students" + " (id INT(11) NOT NULL AUTO_INCREMENT,"
+                + " firstname VARCHAR(255) NOT NULL COLLATE utf8_unicode_ci, "
+                + "lastname VARCHAR(255) NOT NULL COLLATE utf8_unicode_ci, "
+                + "password VARCHAR(255) NOT NULL COLLATE utf8_unicode_ci, "
+                + "PRIMARY KEY (id))";
+
+        try {
+            state.executeUpdate(createTable);
+        }catch (SQLException e){
+            throw new SQLException(state.getWarnings().getMessage(),
+                    state.getWarnings().getSQLState(),
+                    state.getWarnings().getErrorCode());
+        }
+    }
+
+    private void createCourses() throws SQLException{
 
         String createTable;
         createTable = "CREATE TABLE IF NOT EXISTS " + "courses" + " (id INT(11) NOT NULL AUTO_INCREMENT,"
@@ -137,12 +143,14 @@ public class MyJDBC {
         }
     }
 
-    private static void createSchedule() throws SQLException{
+    private void createSchedule() throws SQLException{
 
         String createTable;
-        createTable = "CREATE TABLE IF NOT EXISTS " + "schedule" + " (week_day VARCHAR(255) NOT NULL COLLATE utf8_unicode_ci,"
+        createTable = "CREATE TABLE IF NOT EXISTS " + "schedule" + " (date_day VARCHAR(255) NOT NULL COLLATE utf8_unicode_ci,"
+                + " week_day VARCHAR(255) NOT NULL COLLATE utf8_unicode_ci, "
                 + " course_name VARCHAR(255) NOT NULL COLLATE utf8_unicode_ci, "
-                + "prof_Id INT(11) NOT NULL, "
+                + " prof_Id INT(11) NOT NULL, "
+                + " location VARCHAR(255) NOT NULL COLLATE utf8_unicode_ci, "
                 + "PRIMARY KEY (week_day))";
 
         try {
@@ -154,7 +162,7 @@ public class MyJDBC {
         }
     }
 
-    private static void createRoom() throws SQLException{
+    private  void createRoom() throws SQLException{
 
         String createTable;
         createTable = "CREATE TABLE IF NOT EXISTS " + "rooms" + " (room_nr INT(11) NOT NULL,"
@@ -172,7 +180,7 @@ public class MyJDBC {
 
     /////////////////////////////////////////////////////////////////////////
 
-    private static void insertCoursesInTable(String courseName, int index) throws SQLException{
+    /*private static void insertCoursesInTable(String courseName, int index) throws SQLException{
 
         stmt = connection.prepareStatement("INSERT INTO courses (course_name, proff_Id)VALUES(?, ?)");
 
@@ -229,17 +237,38 @@ public class MyJDBC {
                     stmt.getWarnings().getSQLState(),
                     stmt.getWarnings().getErrorCode());
         }
+    }*/
+
+    public void insertIntoScheduleTable(String date_day,String week_day, String course_name, int prof_Id, String location) throws SQLException {
+
+        stmt = connection.prepareStatement("INSERT INTO schedule (date_day, week_day, course_name, prof_Id, location)VALUES(?, ?, ?, ?, ?)");
+
+        try {
+            stmt.setString(1, date_day);
+            stmt.setString(2, week_day);
+            stmt.setString(3, course_name);
+            stmt.setInt(4, prof_Id);
+            stmt.setString(5, location);
+            stmt.addBatch();
+            stmt.executeBatch();
+
+        } catch (SQLException e) {
+            /*throw new SQLException(stmt.getWarnings().getMessage(),
+                    stmt.getWarnings().getSQLState(),
+                    stmt.getWarnings().getErrorCode());*/
+
+        }
     }
 
-    public static void insertIntoScheduleTable(String week_day, String course_name, int prof_Id) throws SQLException {
+    /*public static void insertIntoStudentsTable(String firstname, String lastname, String password) throws SQLException {
 
-        stmt = connection.prepareStatement("INSERT INTO schedule (week_day, course_name, prof_Id)VALUES(?, ?, ?)");
+        stmt = connection.prepareStatement("INSERT INTO students (firstname,lastname,password)VALUES(?, ?, ?)");
 
         try {
 
-            stmt.setString(1, week_day);
-            stmt.setString(2, course_name);
-            stmt.setInt(3, prof_Id);
+            stmt.setString(1, firstname);
+            stmt.setString(2, lastname);
+            stmt.setString(3, password);
             stmt.addBatch();
             stmt.executeBatch();
 
@@ -250,11 +279,29 @@ public class MyJDBC {
         }
     }
 
+    public static void insertIntoAdminTable(String firstname, String lastname) throws SQLException {
+
+        stmt = connection.prepareStatement("INSERT INTO administrator (firstname,lastname)VALUES(?, ?)");
+
+        try {
+
+            stmt.setString(1, firstname);
+            stmt.setString(2, lastname);
+            stmt.addBatch();
+            stmt.executeBatch();
+
+        } catch (SQLException e) {
+            throw new SQLException(stmt.getWarnings().getMessage(),
+                    stmt.getWarnings().getSQLState(),
+                    stmt.getWarnings().getErrorCode());
+        }
+    }*/
+
     ////////////////////////////////////////////////////////////////////////////
 
 
 
-    public static boolean searchForRecord(String collumn, String tablename, String username){
+    public boolean searchForRecord(String collumn, String tablename, String username){
 
         try {
             result = state.executeQuery("SELECT " + collumn + " FROM " + tablename);
@@ -271,28 +318,18 @@ public class MyJDBC {
 /////////////////////////////////////////////////
     public void createTable(DefaultTableModel model){
 
-        //Container cnt = this.getContentPane();
-        JTable jtbl = new JTable(model);
-            cnt.setLayout(new FlowLayout(FlowLayout.LEFT));
-            model.addColumn("Id");
-            model.addColumn("Username");
-            model.addColumn("Password");
-            model.addColumn("Create");
-            try {
-                stmt = connection.prepareStatement("SELECT * FROM schedule");
-                ResultSet Rs = stmt.executeQuery();
-                while(Rs.next()){
-                    model.addRow(new Object[]{Rs.getInt(1),
-                            Rs.getString(2),
-                            Rs.getInt(3)});
-                }
-            } catch (Exception e) {
-                System.out.println(e.getMessage());
-            }
-            JScrollPane pg = new JScrollPane(jtbl);
-            cnt.add(pg);
-            this.pack();
+
     }
+
+
+    public static Connection getConnection() {
+        return connection;
+    }
+
+    public static PreparedStatement getStmt() {
+        return stmt;
+    }
+
 
     /*public static void validation(){
         String input;

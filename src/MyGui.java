@@ -1,6 +1,9 @@
 import javax.swing.*;
+import javax.swing.table.DefaultTableModel;
 import java.awt.*;
-import java.sql.SQLException;
+import java.awt.event.ItemEvent;
+import java.awt.event.ItemListener;
+import java.sql.*;
 
 
 /*
@@ -11,18 +14,30 @@ import java.sql.SQLException;
 
 public class MyGui extends JFrame{
 
-    JFrame login = new JFrame();
-    JFrame errorFrame = new JFrame();
-    JFrame table = new JFrame();
-    JTable table1 = new JTable();
-    JTextField eMail = new JTextField();
-    JTextField user = new JTextField();
-    JPanel accountsPanel = new JPanel();
-    private JButton button = new JButton();
-    private JButton okayButton = new JButton();
+
+    private JFrame login = new JFrame();
+    private JFrame errorFrame = new JFrame();
+    prvate JFrame userFrame = new JFrame();
+    private JFrame table;
+    private JFrame proftable;
+    private JTable table1 = new JTable();
+    private JTextField eMail = new JTextField();
+    private JTextField user = new JTextField();
+    private JTextField date_day = new JTextField();
+    private JTextField week_day = new JTextField();
+    private JTextField course_name = new JTextField();
+    private JTextField prof_Id = new JTextField();
+    private JTextField location = new JTextField();
+    private JPanel accountsPanel = new JPanel();
+    private JCheckBox c1,c2,c3;
+    private final JButton button = new JButton();
+    private final JButton okayButton = new JButton();
+    private final JButton userButton = new JButton();
+    private final ButtonGroup group = new ButtonGroup();
 
     public MyGui(){
         createLogFrame( 500, 400, "Login");
+
         createButton();
         createOkayButton();
     }
@@ -39,24 +54,36 @@ public class MyGui extends JFrame{
         this.login.setLocationRelativeTo(null);
 
         this.login.add(createHeader(new JPanel(),0,0, 500, 50));
-        //super.add(createHeadLines(new JPanel(),0,50,375, 50, "Login User"));
+
         this.login.add(createHeadLines(new JPanel(),0,50,500, 50, "Login/Signing user"));
 
-        this.login.add(createTextLinesUser(new JPanel(), 250, 150, 200, 50));
-        this.login.add(createTextLinesEmail(new JPanel(), 250, 220, 200, 50));
-        //super.add(createPasswordLines(new JPanel(), 500, 300, 250, 50));
+        this.login.add(createTextLinesUser(new JPanel(), 250, 120, 200, 50));
+        this.login.add(createTextLinesEmail(new JPanel(), 250, 170, 200, 50));
 
-        this.login.add(createInfoForTextLines(new JPanel(),0, 150, 200, 50, "Username:"));
-        this.login.add(createInfoForTextLines(new JPanel(),0, 220, 200, 50, "E-mail:"));
-       // super.add(createInfoForTextLines(new JPanel(),400, 300, 100, 50, "Password:"));
-        this.login.add(createInfoForTextLines(new JPanel(),0, 300, 100, 50, "Admin:"));
 
-        //super.add(createJTextField(usersRegisterd,0, 100, 375, 470, "old text"));
-        //super.add(createProgressbar(new JProgressBar(), 0, 590, 320, 10));
+        this.login.add(createInfoForTextLines(new JPanel(),0, 120, 200, 50, "Username:"));
+        this.login.add(createInfoForTextLines(new JPanel(),0, 170, 200, 50, "Password:"));
 
+        createCheckBox();
+        this.login.add(c1);
+        this.login.add(c2);
+        this.login.add(c3);
     }
 
-    //Fill in Infos about our users in text
+    public void createCheckBox(){
+        c1 = new JCheckBox("Admin");
+        c2 = new JCheckBox("Professor");
+        c3 = new JCheckBox("Student");
+
+        c1.setBounds(0, 275, 100,30);
+        c2.setBounds(0, 300, 100,30);
+        c3.setBounds(0, 325, 100,30);
+
+        this.group.add(c1);
+        this.group.add(c2);
+        this.group.add(c3);
+    }
+
     public JLabel createHeaderLabel(JLabel label, String text, int fontsize){
 
         label.setText(text);
@@ -74,35 +101,30 @@ public class MyGui extends JFrame{
     }
 
     public JPanel createHeader(JPanel panel, int x, int y, int width, int height){
-        //panel.setBackground(Color.WHITE);
         panel.setBounds(x, y, width, height);
         panel.add(createHeaderLabel(new JLabel(),"My Timetable", 30));
         return panel;
     }
 
     public JPanel createHeadLines(JPanel panel, int x, int y, int width, int height, String text){
-        //panel.setBackground(Color.WHITE);
         panel.setBounds(x, y, width, height);
         panel.add(createHeaderLabel(new JLabel(),text, 20));
         return panel;
     }
 
     public JPanel createInfoForTextLines(JPanel panel, int x, int y, int width, int height, String text) {
-        //panel.setBackground(Color.WHITE);
         panel.setBounds(x, y, width, height);
         panel.add(createHeaderLabel(new JLabel(),text, 20));
         return panel;
     }
 
     public JPanel createTextLinesUser(JPanel panel, int x, int y, int width, int height){
-        //panel.setBackground(Color.WHITE);
         panel.setBounds(x, y, width, height);
         panel.add(createTextField(this.user, 200, 25));
         return panel;
     }
 
     public JPanel createTextLinesEmail(JPanel panel, int x, int y, int width, int height){
-        //panel.setBackground(Color.WHITE);
         panel.setBounds(x, y, width, height);
         panel.add(createTextField(this.eMail, 200, 25));
         return panel;
@@ -120,97 +142,68 @@ public class MyGui extends JFrame{
         this.login.add(button);
     }
 
-    public void error(String text){
-        this.errorFrame.setTitle("Duplicate Warining");
+    public void error(String text, String message){
+        this.errorFrame.setTitle(text);
         this.errorFrame.setLayout(null);
-        //frame.getContentPane().setBackground(Color.white);
         this.errorFrame.setResizable(false);
         this.errorFrame.setSize(300, 120);
         this.errorFrame.setLocationRelativeTo(null);
         this.errorFrame.setDefaultCloseOperation(EXIT_ON_CLOSE);
         this.errorFrame.setVisible(true);
         this.errorFrame.add(new JLabel(text));
-        this.errorFrame.add(createInfoForErrorLines(new JPanel(),50, 0, 200, 50, "incorrect input"));
+        this.errorFrame.add(createInfoForErrorLines(new JPanel(),50, 0, 200, 50, message));
         this.errorFrame.add(okayButton);
     }
+
     public void createOkayButton(){
         this.okayButton.setBounds(100, 50, 100,20);
         this.okayButton.setText("Okay");
         this.okayButton.setFocusable(false);
     }
+
     public JPanel createInfoForErrorLines(JPanel panel, int x, int y, int width, int height, String text) {
-        //panel.setBackground(Color.WHITE);
         panel.setBounds(x, y, width, height);
         panel.add(createHeaderLabel(new JLabel(),text, 15));
         return panel;
     }
 
-    public Container createTableFrame(int width, int height, String title){
-        this.table.setTitle(title);
+    public void createStudnetTimetable(int width, int height){
+        this.table = new Timetable();
+        this.table.setTitle("My Timetable");
         this.table.setResizable(false);
         this.table.setSize(width,height);
-        this.table.setLayout(null);
         this.table.setDefaultCloseOperation(EXIT_ON_CLOSE);
-        //super.getContentPane().setBackground(Color.white);
         this.table.setVisible(true);
         this.table.setLocationRelativeTo(null);
-        this.table.add(createHeader(new JPanel(),500,0, 500, 50));
-        Container cnt = this.getContentPane();
-        return cnt;
-
-
     }
 
+    public void createProfTimetable(int width, int height){
+        this.proftable = new Timetable();
+        this.proftable.setTitle("Prof Timetable");
+        this.proftable.setResizable(false);
+        this.proftable.setSize(width,height);
+        this.proftable.setDefaultCloseOperation(EXIT_ON_CLOSE);
+        this.proftable.setVisible(true);
+        this.proftable.setLocationRelativeTo(null);
 
+        this.proftable.add(createTextLinesProf(new JPanel(), 700, 120, 200, 50, date_day));
+        this.proftable.add(createInfoForTextLines(new JPanel(),0, 120, 200, 50, "date_day:"));
+        this.proftable.add(createTextLinesProf(new JPanel(), 700, 200, 200, 50, week_day));
+        this.proftable.add(createInfoForTextLines(new JPanel(),0, 120, 200, 50, "week_day:"));
+        this.proftable.add(createTextLinesProf(new JPanel(), 700, 280, 200, 50, course_name));
+        this.proftable.add(createInfoForTextLines(new JPanel(),0, 120, 200, 50, "course_name:"));
+        this.proftable.add(createTextLinesProf(new JPanel(), 700, 360, 200, 50, prof_Id));
+        this.proftable.add(createInfoForTextLines(new JPanel(),0, 120, 200, 50, "prof_Id:"));
+        this.proftable.add(createTextLinesProf(new JPanel(), 700, 440, 200, 50, location));
+        this.proftable.add(createInfoForTextLines(new JPanel(),0, 120, 200, 50, "location:"));
+        this.proftable.add(userButton);
+    }
 
-
-    /*public JPanel createPasswordLines(JPanel panel, int x, int y, int width, int height){
-        //panel.setBackground(Color.WHITE);
+    public JPanel createTextLinesProf(JPanel panel, int x, int y, int width, int height, JTextField jtf){
         panel.setBounds(x, y, width, height);
-        panel.add(createPasswordField(password, 200, 25));
+        panel.add(createTextField(jtf, 200, 25));
         return panel;
     }
-
-    public JPasswordField createPasswordField(JPasswordField field, int width, int height){
-        field.setPreferredSize(new Dimension(width, height));
-        return field;
-    }
-
-    public JTextArea createJTextField(JTextArea users, int x, int y, int width, int height, String text) {
-        users.setBackground(Color.WHITE);
-        users.setBounds(x, y, width, height);
-        users.setEditable(false);
-        users.setLineWrap(true);
-        super.getContentPane().add(users);
-        return users;
-    }
-
-    public JProgressBar createProgressbar(JProgressBar progressBar, int x, int y, int width, int height){
-        progressBar.setBounds(x, y, width, height);
-        return progressBar;
-    }*/
-
-
-
-    public void createDataPanel(JPanel panel,int x, int y, int width, int height){
-        panel.setBounds(x,y,width,height);
-        panel.setLayout(null);
-        // panel.add(Headerlabel);
-    }
-
-    public void createListPanel(int x, int y, int width, int height){
-        accountsPanel.setBackground(Color.blue);
-        accountsPanel.setBounds(x,y,width,height);
-        accountsPanel.setLayout(null);
-        //accountsPanel.add(Headerlabel);
-    }
-
-    public void createImageLabel(JLabel label){
-        ImageIcon image = new ImageIcon("<path to image>");
-        label.setIcon(image);      // set the image that i want
-        label.setIconTextGap(-25); //set gap of text to image
-    }
-
 
     public JTextField getUser() {
         return user;
@@ -221,6 +214,28 @@ public class MyGui extends JFrame{
         return eMail;
     }
 
+    public JTextField getDate_day() {
+        return date_day;
+    }
+
+    public JTextField getWeek_day() {
+        return week_day;
+    }
+
+    public JTextField getCourse_name() {
+        return course_name;
+    }
+
+    public JTextField getProf_Id() {
+        return prof_Id;
+    }
+
+
+    public JTextField getLocationText() {
+        return location;
+    }
+
+
 
     public JButton getButton() {
         return button;
@@ -229,6 +244,36 @@ public class MyGui extends JFrame{
     public JButton getOkayButton() {
         return okayButton;
     }
+
+    public JButton getUserButton() {
+        return userButton;
+    }
+
+    public javax.swing.JFrame getLogin() {
+        return login;
+    }
+
+    public javax.swing.JFrame getErrorFrame() {
+        return errorFrame;
+    }
+
+    public javax.swing.JFrame getProftable() {
+        return proftable;
+    }
+
+    public JCheckBox getC1() {
+        return c1;
+    }
+
+    public JCheckBox getC2() {
+        return c2;
+    }
+
+    public JCheckBox getC3() {
+        return c3;
+    }
+
+
 
 
 }

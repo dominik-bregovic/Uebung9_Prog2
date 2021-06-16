@@ -1,7 +1,7 @@
 import javax.swing.*;
-import javax.swing.table.DefaultTableModel;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.sql.SQLException;
 import java.util.*;
 
 public class Logic extends JFrame implements ActionListener {
@@ -10,11 +10,22 @@ public class Logic extends JFrame implements ActionListener {
     private MyGui log;
     JTextField pass = new JTextField();
     JTextField user = new JTextField();
+    JTextField date_day = new JTextField();
+    JTextField week_day = new JTextField();
+    JTextField course_name = new JTextField();
+    JTextField professorId = new JTextField();
+    JTextField location = new JTextField();
     JTextArea usersRegistered = new JTextArea();
     JButton button ;
     JButton okayButton;
+    JButton userButton;
     String password = "msd";
     String userName = "";
+    String date = "";
+    String day = "";
+    String course = "";
+    Integer prof;
+    String locate = "";
 
 
     public Logic(MyJDBC database, MyGui login){
@@ -26,15 +37,22 @@ public class Logic extends JFrame implements ActionListener {
 
 
     public void retrievData(){
-       this.user = log.getUser();
-       this.pass = log.getEmail();
-       this.button = log.getButton();
-       this.okayButton = log.getOkayButton();
+        this.user = log.getUser();
+        this.pass = log.getEmail();
+        this.date_day = log.getDate_day();
+        this.week_day = log.getWeek_day();
+        this.course_name = log.getCourse_name();
+        this.professorId = log.getProf_Id();
+        this.location = log.getLocationText();
+        this.button = log.getButton();
+        this.okayButton = log.getOkayButton();
+        this.userButton = log.getUserButton();
     }
 
     public void addActionListenerToButton(){
         button.addActionListener(this::actionPerformed);
         okayButton.addActionListener(this::actionPerformed2);
+        userButton.addActionListener(this:: actionPerformed3);
     }
 
     @Override
@@ -46,21 +64,41 @@ public class Logic extends JFrame implements ActionListener {
 
     public void actionPerformed2(ActionEvent e) {
         if (e.getSource() == okayButton){
-            log.errorFrame.dispose();
+            log.getErrorFrame().dispose();
+        }
+    }
+
+    public void actionPerformed3(ActionEvent e) {
+        if (e.getSource() == userButton){
+            getProfChanges();
+            try {
+                jdbc.insertIntoScheduleTable(date, day, course, prof, locate);
+                log.getProftable().revalidate();
+                log.error("Insertion", "Insertion complete");
+            } catch (SQLException er) {
+                //create error frame and go again
+                log.error("inserting error", "invalid input");
+            }
         }
     }
 
     public void doesUserExist(){
         getInput();
-        if (jdbc.searchForRecord("firstname", "professors", userName) &&
-                jdbc.searchForRecord("password", "professors", password)){
-            log.login.dispose();
-            log.table1.setModel(new DefaultTableModel());
-            log.table.add(log.table1);
+        if (log.getC1().isSelected()){
+           selector("firstname", "lastname", "administrator", "incorrect input","No such Admin!!");
 
+        }else if(log.getC2().isSelected()){
+           selector("firstname", "password", "professors", "incorrect input", "No such Prof");
+            alterTimetable();
+            System.out.println(day);
+
+        }else if (log.getC3().isSelected()){
+            selector("firstname", "password", "students", "incorrect input", "No such Stud");
+            goToTimetable(475, 490);
         }else{
-            log.error("dont know");
+            log.error("Please choose a user", "No user choosen");
         }
+
     }
 
     public void getInput(){
@@ -70,83 +108,45 @@ public class Logic extends JFrame implements ActionListener {
         pass.setText("");
     }
 
-    public void errorMemmoryLimit(String text){
-        JFrame frame = new JFrame();
-        frame.setTitle("Duplicate Warining");
-        //frame.getContentPane().setBackground(Color.white);
-        frame.setResizable(false);
-        frame.setSize(200, 200);
-        frame.setLocationRelativeTo(null);
-        frame.setDefaultCloseOperation(EXIT_ON_CLOSE);
-        frame.setVisible(true);
-        frame.add(new JLabel(text));
-        frame.add(button);
+    public void selector(String column1, String column2, String tablename, String errorMessage, String header){
+        if (MyJDBC.searchForRecord(column1, tablename, userName) &&
+                MyJDBC.searchForRecord(column2, tablename, password)){
+            log.getLogin().dispose();
+            return;
 
-    }
+        }else{
+            log.error(header, errorMessage);
 
-
-
-
-
-
-    /*public boolean validateUserEmail(){
-        int counter = 0;
-        boolean val = false;
-
-        for (int i = 0; i < userPassword.size(); i++) {
-            if (userPassword.get(i).contains(pass.getText())){
-                counter = Collections.frequency(userPassword, pass.getText());
-            }
-
-            if (counter > 1){
-                userPassword = sortingListToUniqueElements(userPassword);
-                error("User already exists");
-                break;
-            }
-        }
-        return val;
-    }*/
-
-
-
-    public void validation(boolean userVal, boolean emailVal){
-        if(userVal && emailVal){
-            usersRegistered.append(user.getText()+" ("+ pass.getText()+")");
         }
     }
 
-    public List<String> sortingListToUniqueElements(List<String> listOfWords ){
-        Set<String> uniqueWords = new HashSet<>();
-        List<String> uniqueList;
-        uniqueWords.addAll(listOfWords);
-        uniqueList = new ArrayList<>(uniqueWords);
-        return  uniqueList;
+    public void alterTimetable(){
+        log.createProfTimetable(475, 790);
+
+
+    }
+    public void getProfChanges(){
+        try {
+            date = date_day.getText();
+            date_day.setText("");
+            day = week_day.getText();
+            week_day.setText("");
+            course = course_name.getText();
+            course_name.setText("");
+            prof = Integer.valueOf(professorId.getText());
+            professorId.setText("");
+            locate = location.getText();
+            location.setText("");
+        }catch(NumberFormatException e){
+            log.getProftable().dispose();
+            alterTimetable();
+            log.error("inserting error", "invalid input");
+
+        }
     }
 
-
-
-
-
-    /*public boolean validateUserName(){
-        int counter = 0;
-        boolean val = false;
-
-        for (int i = 0; i < userNames.size(); i++) {
-            if (userNames.get(i).contains(user.getText())){
-                counter = Collections.frequency(userNames, user.getText());
-            }
-
-            if (counter > 1){
-                userNames = sortingListToUniqueElements(userNames);
-                error("E-mail address already exists!");
-                break;
-            }else {
-                val = true;
-            }
-        }
-        return val;
-    }*/
-
-
+    public void goToTimetable(int x, int y){
+        log.createStudnetTimetable(x, y);
+    }
 
 }
