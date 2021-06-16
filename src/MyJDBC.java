@@ -337,14 +337,15 @@ public class MyJDBC {
             validation();
         }
 
-    }
+    }*/
 
-    public static void sendingDeleteRequest(Long idRow){
+    public static void sendingDeleteRequest(String firstnames){
         try {
-            connection.setAutoCommit(false);
-            state.addBatch("DELETE FROM salary WHERE id =" + idRow);
+            String delete = "DELETE FROM professors WHERE firstname = "+ firstnames;
+            state.executeUpdate(delete);
+
         }catch (Exception e){
             System.err.println(e.getMessage());
         }
-    }*/
+    }
 }

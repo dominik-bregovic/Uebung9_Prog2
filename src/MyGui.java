@@ -12,10 +12,8 @@ public class MyGui extends JFrame{
 
     private JFrame login = new JFrame();
     private JFrame errorFrame = new JFrame();
-    private JFrame userFrame = new JFrame();
     private JFrame table;
     private JFrame proftable;
-    private JTable table1 = new JTable();
     private JTextField eMail = new JTextField();
     private JTextField user = new JTextField();
     private JTextField date_day = new JTextField();
@@ -23,17 +21,19 @@ public class MyGui extends JFrame{
     private JTextField course_name = new JTextField();
     private JTextField prof_Id = new JTextField();
     private JTextField location = new JTextField();
-    private JPanel accountsPanel = new JPanel();
+    private JTextField professorIdForDelete = new JTextField();
     private JCheckBox c1,c2,c3;
     private final JButton button = new JButton();
     private final JButton okayButton = new JButton();
     private final JButton userButton = new JButton();
+    private final JButton deleteButton = new JButton();
     private final ButtonGroup group = new ButtonGroup();
 
     public MyGui(){
         createLogFrame( 500, 400, "Login");
         createButton();
         createOkayButton();
+        createDeleteButton();
     }
 
 
@@ -49,7 +49,7 @@ public class MyGui extends JFrame{
 
         this.login.add(createHeader(new JPanel(),0,0, 500, 50));
 
-        this.login.add(createHeadLines(new JPanel(),0,50,500, 50, "Login/Signing user"));
+        this.login.add(createHeadLines(new JPanel(),0,50,500, 50, "Login user"));
 
         this.login.add(createTextLinesUser(new JPanel(), 250, 120, 200, 50));
         this.login.add(createTextLinesEmail(new JPanel(), 250, 170, 200, 50));
@@ -85,7 +85,7 @@ public class MyGui extends JFrame{
         label.setVerticalTextPosition(JLabel.CENTER);            //positioning text to image
         label.setForeground(Color.BLACK);
         label.setFont(new Font("MV Boli", Font.PLAIN, fontsize));
-        label.setBackground(Color.WHITE); //set Background color
+        //label.setBackground(Color.WHITE); //set Background color
         label.setOpaque(true);     //with this Background pixels are changed
         //label.setVerticalAlignment(JLabel.TOP); // set place of label only by BorderLayout
         //label.setHorizontalAlignment(JLabel.LEFT);
@@ -150,6 +150,7 @@ public class MyGui extends JFrame{
     }
 
     public void createOkayButton(){
+        this.okayButton.setBounds(100, 40, 100,30);
         this.okayButton.setText("Okay");
         this.okayButton.setFocusable(false);
         this.errorFrame.add(okayButton);
@@ -199,6 +200,26 @@ public class MyGui extends JFrame{
         return panel;
     }
 
+    public void deleteProf(int width, int height){
+        this.proftable = new Userhandling();
+        this.proftable.setTitle("Delete User");
+        this.proftable.setResizable(false);
+        this.proftable.setSize(width,height);
+        this.proftable.setDefaultCloseOperation(EXIT_ON_CLOSE);
+        this.proftable.setVisible(true);
+        this.proftable.setLocationRelativeTo(null);
+
+        this.proftable.add(createTextLinesProf(new JPanel(), 700, 120, 200, 50, professorIdForDelete));
+        this.proftable.add(createInfoForTextLines(new JPanel(),0, 120, 200, 50, "Insert firstname"));
+        this.proftable.add(deleteButton);
+    }
+    public void createDeleteButton(){
+        this.deleteButton.setBounds(100, 40, 100,30);
+        this.deleteButton.setText("Delete");
+        this.deleteButton.setFocusable(false);
+
+    }
+
     public JTextField getUser() {
         return user;
     }
@@ -243,6 +264,12 @@ public class MyGui extends JFrame{
         return userButton;
     }
 
+
+    public JButton getDeleteButton() {
+        return deleteButton;
+    }
+
+
     public javax.swing.JFrame getLogin() {
         return login;
     }
@@ -254,6 +281,11 @@ public class MyGui extends JFrame{
     public javax.swing.JFrame getProftable() {
         return proftable;
     }
+
+    public JTextField getProfessorIdForDelete() {
+        return professorIdForDelete;
+    }
+
 
     public JCheckBox getC1() {
         return c1;

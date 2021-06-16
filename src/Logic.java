@@ -20,9 +20,11 @@ public class Logic extends JFrame implements ActionListener {
     private JTextField course_name = new JTextField();
     private JTextField professorId = new JTextField();
     private JTextField location = new JTextField();
+    private JTextField deleteProfId = new JTextField();
     private JButton button ;
     private JButton okayButton;
     private JButton userButton;
+    private JButton deleteButton;
     private String password = "msd";
     private String userName = "";
     private String date = "";
@@ -30,6 +32,7 @@ public class Logic extends JFrame implements ActionListener {
     private String course = "";
     private Integer prof;
     private String locate = "";
+    private String deleteProf = "";
 
 
     public Logic(MyJDBC database, MyGui login){
@@ -48,15 +51,18 @@ public class Logic extends JFrame implements ActionListener {
         this.course_name = log.getCourse_name();
         this.professorId = log.getProf_Id();
         this.location = log.getLocationText();
+        this.deleteProfId = log.getProfessorIdForDelete();
         this.button = log.getButton();
         this.okayButton = log.getOkayButton();
         this.userButton = log.getUserButton();
+        this.deleteButton = log.getDeleteButton();
     }
 
     public void addActionListenerToButton(){
         button.addActionListener(this::actionPerformed);
         okayButton.addActionListener(this::actionPerformed2);
         userButton.addActionListener(this:: actionPerformed3);
+        deleteButton.addActionListener(this::actionPerformed4);
     }
 
 
@@ -86,11 +92,18 @@ public class Logic extends JFrame implements ActionListener {
         }
     }
 
+    public void actionPerformed4(ActionEvent e) {
+        if (e.getSource() == deleteButton){
+            getInputId();
+            jdbc.sendingDeleteRequest(deleteProf);
+        }
+    }
+
     public void doesUserExist(){
         getInput();
         if (log.getC1().isSelected()){
            selector("firstname", "lastname", "administrator", "incorrect input","No such Admin!!");
-
+           log.deleteProf(475,550);
         }else if(log.getC2().isSelected()){
            selector("firstname", "password", "professors", "incorrect input", "No such Prof");
             alterTimetable();
@@ -126,8 +139,6 @@ public class Logic extends JFrame implements ActionListener {
 
     public void alterTimetable(){
         log.createProfTimetable(475, 790);
-
-
     }
 
     //not right handheld
@@ -153,6 +164,11 @@ public class Logic extends JFrame implements ActionListener {
 
     public void goToTimetable(int x, int y){
         log.createStudnetTimetable(x, y);
+    }
+
+    public void getInputId(){
+        deleteProf = deleteProfId.getText();
+        deleteProfId.setText("");
     }
 
 }
