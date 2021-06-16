@@ -1,6 +1,3 @@
-import javax.swing.*;
-import javax.swing.table.DefaultTableModel;
-import java.awt.*;
 import java.sql.*;
 import java.util.Scanner;
 
@@ -316,11 +313,6 @@ public class MyJDBC {
         return false;
     }
 /////////////////////////////////////////////////
-    public void createTable(DefaultTableModel model){
-
-
-    }
-
 
     public static Connection getConnection() {
         return connection;

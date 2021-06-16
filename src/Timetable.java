@@ -2,13 +2,16 @@ import javax.swing.*;
 import java.awt.*;
 import javax.swing.table.DefaultTableModel;
 import java.sql.*;
+
 /*
 * Author: Bregovic Dominik
 * Last change: 15.06
 * Source: https://stackoverflow.com/questions/27815400/retrieving-data-from-jdbc-database-into-jtable/43772751
+* the Timetable
 * */
+
 public class Timetable extends JFrame{
-    private MyJDBC jdbc;
+
 
 
         DefaultTableModel model = new DefaultTableModel();

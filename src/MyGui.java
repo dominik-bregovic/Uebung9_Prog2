@@ -1,10 +1,5 @@
 import javax.swing.*;
-import javax.swing.table.DefaultTableModel;
 import java.awt.*;
-import java.awt.event.ItemEvent;
-import java.awt.event.ItemListener;
-import java.sql.*;
-
 
 /*
  * Author: Bregovic Dominik
@@ -17,7 +12,7 @@ public class MyGui extends JFrame{
 
     private JFrame login = new JFrame();
     private JFrame errorFrame = new JFrame();
-    prvate JFrame userFrame = new JFrame();
+    private JFrame userFrame = new JFrame();
     private JFrame table;
     private JFrame proftable;
     private JTable table1 = new JTable();
@@ -37,7 +32,6 @@ public class MyGui extends JFrame{
 
     public MyGui(){
         createLogFrame( 500, 400, "Login");
-
         createButton();
         createOkayButton();
     }
@@ -152,13 +146,13 @@ public class MyGui extends JFrame{
         this.errorFrame.setVisible(true);
         this.errorFrame.add(new JLabel(text));
         this.errorFrame.add(createInfoForErrorLines(new JPanel(),50, 0, 200, 50, message));
-        this.errorFrame.add(okayButton);
+
     }
 
     public void createOkayButton(){
-        this.okayButton.setBounds(100, 50, 100,20);
         this.okayButton.setText("Okay");
         this.okayButton.setFocusable(false);
+        this.errorFrame.add(okayButton);
     }
 
     public JPanel createInfoForErrorLines(JPanel panel, int x, int y, int width, int height, String text) {

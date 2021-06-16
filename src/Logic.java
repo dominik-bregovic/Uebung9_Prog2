@@ -2,41 +2,45 @@ import javax.swing.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.sql.SQLException;
-import java.util.*;
+
+/*
+ * Author: Bregovic Dominik
+ * here the are jdbc and the gui parts put together
+ * Last change: 15.06
+ * */
 
 public class Logic extends JFrame implements ActionListener {
 
     private MyJDBC jdbc;
     private MyGui log;
-    JTextField pass = new JTextField();
-    JTextField user = new JTextField();
-    JTextField date_day = new JTextField();
-    JTextField week_day = new JTextField();
-    JTextField course_name = new JTextField();
-    JTextField professorId = new JTextField();
-    JTextField location = new JTextField();
-    JTextArea usersRegistered = new JTextArea();
-    JButton button ;
-    JButton okayButton;
-    JButton userButton;
-    String password = "msd";
-    String userName = "";
-    String date = "";
-    String day = "";
-    String course = "";
-    Integer prof;
-    String locate = "";
+    private JTextField pass = new JTextField();
+    private JTextField user = new JTextField();
+    private JTextField date_day = new JTextField();
+    private JTextField week_day = new JTextField();
+    private JTextField course_name = new JTextField();
+    private JTextField professorId = new JTextField();
+    private JTextField location = new JTextField();
+    private JButton button ;
+    private JButton okayButton;
+    private JButton userButton;
+    private String password = "msd";
+    private String userName = "";
+    private String date = "";
+    private String day = "";
+    private String course = "";
+    private Integer prof;
+    private String locate = "";
 
 
     public Logic(MyJDBC database, MyGui login){
         this.jdbc = database;
         this.log = login;
-        retrievData();
+        retrieveData();
         addActionListenerToButton();
     }
 
 
-    public void retrievData(){
+    public void retrieveData(){
         this.user = log.getUser();
         this.pass = log.getEmail();
         this.date_day = log.getDate_day();
@@ -55,7 +59,7 @@ public class Logic extends JFrame implements ActionListener {
         userButton.addActionListener(this:: actionPerformed3);
     }
 
-    @Override
+
     public void actionPerformed(ActionEvent e) {
         if (e.getSource() == button){
             doesUserExist();
@@ -73,8 +77,8 @@ public class Logic extends JFrame implements ActionListener {
             getProfChanges();
             try {
                 jdbc.insertIntoScheduleTable(date, day, course, prof, locate);
-                log.getProftable().revalidate();
-                log.error("Insertion", "Insertion complete");
+                log.getProftable().dispose();
+                alterTimetable();
             } catch (SQLException er) {
                 //create error frame and go again
                 log.error("inserting error", "invalid input");
@@ -109,8 +113,8 @@ public class Logic extends JFrame implements ActionListener {
     }
 
     public void selector(String column1, String column2, String tablename, String errorMessage, String header){
-        if (MyJDBC.searchForRecord(column1, tablename, userName) &&
-                MyJDBC.searchForRecord(column2, tablename, password)){
+        if (jdbc.searchForRecord(column1, tablename, userName) &&
+                jdbc.searchForRecord(column2, tablename, password)){
             log.getLogin().dispose();
             return;
 
@@ -125,6 +129,8 @@ public class Logic extends JFrame implements ActionListener {
 
 
     }
+
+    //not right handheld
     public void getProfChanges(){
         try {
             date = date_day.getText();
